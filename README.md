@@ -1,0 +1,59 @@
+A REST API for ARK Invest holdings data, written in rust using [axum](https://github.com/tokio-rs/axum), Redoc/Swagger through [Aide](https://github.com/tamasfe/aide), and parquet using [polars](https://github.com/pola-rs/polars)
+
+[api.NexVeridian.com](https://api.NexVeridian.com)
+
+Not affiliated with Ark Invest
+
+# Install
+
+Create docker-compose.yml
+```
+version: "3"
+services:
+    ark-invest-api-rust:
+        image: ghcr.io/nexveridian/ark-invest-api-rust:latest
+        container_name: ark-invest-api-rust
+        restart: unless-stopped
+        volumes:
+            - ./data:/ark-invest-api-rust/data
+        ports:
+            - "3000:3000"
+
+volumes:
+    data:
+```
+Recomended: add nginx-certbot to the docker-compose file, [GitHub](https://github.com/JonasAlfredsson/docker-nginx-certbot#run-with-docker-compose), [Docker Hub](https://hub.docker.com/r/jonasal/nginx-certbot) 
+
+Create data folder next to docker-compose.yml, `data\parquet\*.parquet` with the ticker in all caps `ARKK.parquet`, get the data from [api.NexVeridian.com](https://api.NexVeridian.com) or [ark-invest-api-rust-data](https://github.com/NexVeridian/ark-invest-api-rust-data)
+
+```
+├───data
+│   └───parquet
+│   	└───*.parquet
+├───docker-compose.yml
+```
+
+`docker compose up --pull always`
+
+# Dev Install
+## Dev Containers
+Install docker, vscode and the [Dev Containers Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+
+`git clone`
+
+`Ctrl+Shift+P` **Dev Containers: Open Folder in Container**
+
+Place data in `data\parquet\*.parquet` with the ticker in all caps `ARKK.parquet`, get the data from [api.NexVeridian.com](https://api.NexVeridian.com) or [ark-invest-api-rust-data](https://github.com/NexVeridian/ark-invest-api-rust)
+
+`cargo run`
+
+## Docker Compose
+`git clone`
+
+Recomended: add nginx-certbot to the docker-compose file, [GitHub](https://github.com/JonasAlfredsson/docker-nginx-certbot#run-with-docker-compose), [Docker Hub](https://hub.docker.com/r/jonasal/nginx-certbot) 
+
+Place data in `data\parquet\*.parquet` with the ticker in all caps `ARKK.parquet`, get the data from [api.NexVeridian.com](https://api.NexVeridian.com) or [ark-invest-api-rust-data](https://github.com/NexVeridian/ark-invest-api-rust)
+
+`docker compose build && docker compose up`
+
+Remove the cargo cache for buildkit with `docker builder prune --filter type=exec.cachemount`

@@ -1,0 +1,7 @@
+.dockerignore
+/.devcontainer
+/target
+Cargo.lock
+docker-compose.yml
+Dockerfile
+README.md
