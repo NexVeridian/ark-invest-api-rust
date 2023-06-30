@@ -1,8 +1,8 @@
 version: "3"
 services:
     ark-invest-api-rust:
-        # image: ghcr.io/NexVeridian/ark-invest-api-rust:latest 
-        image: ark-invest-api-rust
+        image: ghcr.io/NexVeridian/ark-invest-api-rust:latest
+        # image: ark-invest-api-rust
         build:
             context: .
             args:

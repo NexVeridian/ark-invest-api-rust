@@ -5,24 +5,7 @@ A REST API for ARK Invest holdings data, written in rust using [axum](https://gi
 Not affiliated with Ark Invest
 
 # Install
-
-Create docker-compose.yml
-```
-version: "3"
-services:
-    ark-invest-api-rust:
-        image: ghcr.io/nexveridian/ark-invest-api-rust:latest
-        container_name: ark-invest-api-rust
-        restart: unless-stopped
-        volumes:
-            - ./data:/ark-invest-api-rust/data
-        ports:
-            - "3000:3000"
-
-volumes:
-    data:
-```
-Recomended: add nginx-certbot to the docker-compose file, [GitHub](https://github.com/JonasAlfredsson/docker-nginx-certbot#run-with-docker-compose), [Docker Hub](https://hub.docker.com/r/jonasal/nginx-certbot) 
+Copy docker-compose.yml
 
 Create data folder next to docker-compose.yml, `data\parquet\*.parquet` with the ticker in all caps `ARKK.parquet`, get the data from [api.NexVeridian.com](https://api.NexVeridian.com) or [ark-invest-api-rust-data](https://github.com/NexVeridian/ark-invest-api-rust-data)
 
@@ -49,8 +32,6 @@ Place data in `data\parquet\*.parquet` with the ticker in all caps `ARKK.parquet
 
 ## Docker Compose
 `git clone`
-
-Recomended: add nginx-certbot to the docker-compose file, [GitHub](https://github.com/JonasAlfredsson/docker-nginx-certbot#run-with-docker-compose), [Docker Hub](https://hub.docker.com/r/jonasal/nginx-certbot) 
 
 Place data in `data\parquet\*.parquet` with the ticker in all caps `ARKK.parquet`, get the data from [api.NexVeridian.com](https://api.NexVeridian.com) or [ark-invest-api-rust-data](https://github.com/NexVeridian/ark-invest-api-rust)
 
