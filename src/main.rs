@@ -7,17 +7,22 @@ use aide::{
     redoc::Redoc,
     transform::TransformOperation,
 };
-use axum::{error_handling::HandleErrorLayer, http::StatusCode, BoxError, Extension, Json};
+use axum::{
+    error_handling::HandleErrorLayer,
+    http::{Method, StatusCode},
+    BoxError, Extension, Json,
+};
 use std::{net::SocketAddr, time::Duration};
 use tower::{buffer::BufferLayer, limit::RateLimitLayer, ServiceBuilder};
+use tower_http::cors::{Any, CorsLayer};
 
 mod routes;
 
 async fn serve_api(Extension(api): Extension<OpenApi>) -> impl IntoApiResponse {
-    return Json(api);
+    Json(api)
 }
 
-fn description_date<'t>(op: TransformOperation<'t>) -> TransformOperation<'t> {
+fn description_date(op: TransformOperation) -> TransformOperation {
     op.parameter_untyped("start", |p| {
         p.description("Start date range - Inclusive >= - ISO 8601")
     })
@@ -40,6 +45,14 @@ async fn main() {
             .layer(RateLimitLayer::new(req_per_sec, Duration::from_secs(1)))
     };
 
+    let cors = || {
+        ServiceBuilder::new().layer(
+            CorsLayer::new()
+                .allow_methods(Method::GET)
+                .allow_origin(Any),
+        )
+    };
+
     let app = ApiRouter::new()
         .route("/", Redoc::new("/api.json").axum_route())
         .api_route(
@@ -50,6 +63,7 @@ async fn main() {
             }),
         )
         .layer(rate_limit(5))
+        .layer(cors())
         .api_route(
             "/ark_holdings",
             get_with(routes::ark_holdings, |mut o| {
@@ -58,6 +72,7 @@ async fn main() {
             }),
         )
         .layer(rate_limit(20))
+        .layer(cors())
         .route("/api.json", get(serve_api));
 
     let mut api = OpenApi {

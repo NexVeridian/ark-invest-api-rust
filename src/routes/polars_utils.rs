@@ -33,7 +33,7 @@ pub async fn filter_date_range(
     df: DataFrame,
     date_range: Query<DateRange>,
 ) -> Result<DataFrame, Box<dyn Error>> {
-    if date_range.start.or(date_range.end) == None {
+    if date_range.start.or(date_range.end).is_none() {
         return Ok(df);
     }
 
@@ -43,10 +43,10 @@ pub async fn filter_date_range(
         .map(|x| {
             let date = x.unwrap();
             match (date_range.start, date_range.end) {
-                (Some(start), Some(end)) => return date >= start && date <= end,
-                (Some(start), _) => return date >= start,
-                (_, Some(end)) => return date <= end,
-                _ => return false,
+                (Some(start), Some(end)) => date >= start && date <= end,
+                (Some(start), _) => date >= start,
+                (_, Some(end)) => date <= end,
+                _ => false,
             }
         })
         .collect();

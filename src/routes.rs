@@ -10,7 +10,7 @@ pub async fn arkvc_holdings(date_range: Query<polars_utils::DateRange>) -> impl 
         .await
         .unwrap();
 
-    return axum::Json(polars_utils::to_json(filter_df).await.unwrap());
+    axum::Json(polars_utils::to_json(filter_df).await.unwrap())
 }
 
 pub async fn ark_holdings(
@@ -25,5 +25,5 @@ pub async fn ark_holdings(
         .await
         .unwrap();
 
-    return axum::Json(polars_utils::to_json(filter_df).await.unwrap());
+    axum::Json(polars_utils::to_json(filter_df).await.unwrap())
 }
