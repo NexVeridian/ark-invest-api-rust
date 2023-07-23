@@ -14,7 +14,13 @@ use axum::{
 };
 use std::{net::SocketAddr, time::Duration};
 use tower::{buffer::BufferLayer, limit::RateLimitLayer, ServiceBuilder};
-use tower_http::cors::{Any, CorsLayer};
+use tower_governor::{
+    governor::GovernorConfigBuilder, key_extractor::SmartIpKeyExtractor, GovernorLayer,
+};
+use tower_http::{
+    compression::CompressionLayer,
+    cors::{Any, CorsLayer},
+};
 
 mod routes;
 
@@ -33,16 +39,38 @@ fn description_date(op: TransformOperation) -> TransformOperation {
 
 #[tokio::main]
 async fn main() {
-    let rate_limit = |req_per_sec: u64| {
+    let error_handler = || {
+        ServiceBuilder::new().layer(HandleErrorLayer::new(|err: BoxError| async move {
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("Unhandled error: {}", err),
+            )
+        }))
+    };
+
+    let rate_limit_global = |req_per_sec: u64| {
         ServiceBuilder::new()
-            .layer(HandleErrorLayer::new(|err: BoxError| async move {
-                (
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    format!("Unhandled error: {}", err),
-                )
-            }))
+            .layer(error_handler())
             .layer(BufferLayer::new(1024))
             .layer(RateLimitLayer::new(req_per_sec, Duration::from_secs(1)))
+    };
+
+    let rate_limit_ip = || {
+        let config = Box::new(
+            GovernorConfigBuilder::default()
+                .per_second(2)
+                .burst_size(10)
+                .use_headers()
+                .key_extractor(SmartIpKeyExtractor)
+                .finish()
+                .unwrap(),
+        );
+
+        ServiceBuilder::new()
+            .layer(error_handler())
+            .layer(GovernorLayer {
+                config: Box::leak(config),
+            })
     };
 
     let cors = || {
@@ -62,8 +90,12 @@ async fn main() {
                 description_date(o)
             }),
         )
-        .layer(rate_limit(5))
-        .layer(cors())
+        .layer(
+            rate_limit_global(500)
+                .layer(rate_limit_ip())
+                .layer(cors())
+                .layer(CompressionLayer::new().zstd(true)),
+        )
         .api_route(
             "/ark_holdings",
             get_with(routes::ark_holdings, |mut o| {
@@ -71,8 +103,12 @@ async fn main() {
                 description_date(o)
             }),
         )
-        .layer(rate_limit(20))
-        .layer(cors())
+        .layer(
+            rate_limit_global(200)
+                .layer(rate_limit_ip())
+                .layer(cors())
+                .layer(CompressionLayer::new().zstd(true)),
+        )
         .route("/api.json", get(serve_api));
 
     let mut api = OpenApi {

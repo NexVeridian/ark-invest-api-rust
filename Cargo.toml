@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-polars = { version = "0.28", features = [
+polars = { version = "0.32", features = [
 	"lazy",
 	"strings",
 	"parquet",
@@ -22,4 +22,5 @@ chrono = { version = "0.4", features = ["serde"] }
 glob = { version = "0.3" }
 strum_macros = "0.25"
 tower = { version = "0.4", features = ["limit", "buffer"] }
-tower-http = { version = "0.4", features = ["cors"] }
+tower-http = { version = "0.4", features = ["compression-zstd", "cors"] }
+tower_governor = "0.1"
