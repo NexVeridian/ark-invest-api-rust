@@ -83,6 +83,9 @@ async fn main() {
 
     let app = ApiRouter::new()
         .route("/", Redoc::new("/api.json").axum_route())
+        .layer(CompressionLayer::new().zstd(true))
+        .route("/api.json", get(serve_api))
+        .layer(CompressionLayer::new().zstd(true))
         .api_route(
             "/arkvc_holdings",
             get_with(routes::arkvc_holdings, |mut o| {
@@ -108,8 +111,7 @@ async fn main() {
                 .layer(rate_limit_ip())
                 .layer(cors())
                 .layer(CompressionLayer::new().zstd(true)),
-        )
-        .route("/api.json", get(serve_api));
+        );
 
     let mut api = OpenApi {
         info: Info {
@@ -120,7 +122,7 @@ async fn main() {
                 ".to_owned(),
             ),
             description: Some(
-                "[Github](https://github.com/NexVeridian/ark-invest-api-rust)\n\n[Contact Info](https://NexVeridian.com/About)".to_owned(),
+                "[Github](https://github.com/NexVeridian/ark-invest-api-rust)\n\n[Contact Info](https://NexVeridian.com/about)".to_owned(),
             ),
             ..Info::default()
         },
