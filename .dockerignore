@@ -1,5 +1,7 @@
 /.devcontainer
+/.github
 /.vscode
+/data
 /target
 .dockerignore
 Cargo.lock
