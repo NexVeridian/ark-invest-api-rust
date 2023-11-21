@@ -56,13 +56,19 @@ pub async fn filter_date_range(
 }
 
 #[derive(Serialize, Deserialize, JsonSchema, strum_macros::Display)]
-pub enum TypeTicker {
+pub enum Ticker {
+    ARKVX,
     ARKF,
     ARKG,
     ARKK,
     ARKQ,
     ARKW,
     ARKX,
+    // ARKA,
+    // ARKZ,
+    ARKC,
+    ARKD,
+    ARKY,
 }
 
 #[derive(Serialize, Deserialize, JsonSchema)]

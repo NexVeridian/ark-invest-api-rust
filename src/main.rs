@@ -87,27 +87,19 @@ async fn main() {
         .route("/api.json", get(serve_api))
         .layer(CompressionLayer::new().zstd(true))
         .api_route(
-            "/arkvc_holdings",
-            get_with(routes::arkvc_holdings, |mut o| {
-                o = o.id("ARKVC Holdings");
-                description_date(o)
-            }),
-        )
-        .layer(
-            rate_limit_global(500)
-                .layer(rate_limit_ip())
-                .layer(cors())
-                .layer(CompressionLayer::new().zstd(true)),
-        )
-        .api_route(
             "/ark_holdings",
             get_with(routes::ark_holdings, |mut o| {
-                o = o.id("ARK* ETF Holdings");
+                // test description
+                o = o.id("ARK* ETF Holdings").description(r"
+                | date       ┆ ticker     ┆ cusip      ┆ company      ┆ market_value ┆ shares  ┆ share_price ┆ weight │
+                │ ---        ┆ ---        ┆ ---        ┆ ---          ┆ ---          ┆ ---     ┆ ---         ┆ ---    │
+                │ date       ┆ str        ┆ str        ┆ str          ┆ i64          ┆ f64     ┆ f64         ┆ f64    │
+                ");
                 description_date(o)
             }),
         )
         .layer(
-            rate_limit_global(200)
+            rate_limit_global(1000)
                 .layer(rate_limit_ip())
                 .layer(cors())
                 .layer(CompressionLayer::new().zstd(true)),
