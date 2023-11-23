@@ -4,6 +4,8 @@ services:
         image: ghcr.io/nexveridian/ark-invest-api-rust:latest
         container_name: ark-invest-api-rust
         restart: unless-stopped
+        # environment:
+        #     - NGINX = false
         volumes:
             - ./data:/ark-invest-api-rust/data
         ports:

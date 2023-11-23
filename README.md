@@ -18,6 +18,8 @@ Create data folder next to docker-compose.yml, `data\parquet\*.parquet` with the
 
 `docker compose up --pull always`
 
+If not using nginx, set environment NGINX = false in docker compose
+
 # Dev Install
 ## Dev Containers
 Install docker, vscode and the [Dev Containers Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)

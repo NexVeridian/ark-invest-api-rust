@@ -12,7 +12,8 @@ use axum::{
     http::{Method, StatusCode},
     BoxError, Extension, Json,
 };
-use std::{net::SocketAddr, time::Duration};
+use lazy_static::lazy_static;
+use std::{env, net::SocketAddr, time::Duration};
 use tower::{buffer::BufferLayer, limit::RateLimitLayer, ServiceBuilder};
 use tower_governor::{
     governor::GovernorConfigBuilder, key_extractor::SmartIpKeyExtractor, GovernorLayer,
@@ -23,6 +24,16 @@ use tower_http::{
 };
 
 mod routes;
+
+lazy_static! {
+    static ref NGINX: bool = match env::var("NGINX") {
+        Ok(val) => val
+            .to_lowercase()
+            .parse::<bool>()
+            .expect("Env string NGINX must be bool"),
+        Err(_) => true,
+    };
+}
 
 async fn serve_api(Extension(api): Extension<OpenApi>) -> impl IntoApiResponse {
     Json(api)
@@ -58,8 +69,8 @@ async fn main() {
     let rate_limit_ip = || {
         let config = Box::new(
             GovernorConfigBuilder::default()
-                .per_second(2)
-                .burst_size(10)
+                .per_millisecond(500)
+                .burst_size(25)
                 .use_headers()
                 .key_extractor(SmartIpKeyExtractor)
                 .finish()
@@ -81,6 +92,13 @@ async fn main() {
         )
     };
 
+    let route_layer = {
+        rate_limit_global(1_000)
+            .layer(cors())
+            .layer(CompressionLayer::new().zstd(true))
+            .option_layer(if *NGINX { Some(rate_limit_ip()) } else { None })
+    };
+
     let app = ApiRouter::new()
         .route("/", Redoc::new("/api.json").axum_route())
         .layer(CompressionLayer::new().zstd(true))
@@ -96,17 +114,12 @@ async fn main() {
 | date | str    | str   | str     | i64          | f64    | f64         | f64    |
 
 ### Example
-`/ark_holdings?ticker=ARKK&start=2023-01-01&end=2023-03-01`",
+`/ark_holdings?ticker=ARKK&start=2023-10-01&end=2023-11-01`",
                 );
                 description_date(o)
             }),
         )
-        .layer(
-            rate_limit_global(1000)
-                .layer(rate_limit_ip())
-                .layer(cors())
-                .layer(CompressionLayer::new().zstd(true)),
-        );
+        .layer(route_layer);
 
     let mut api = OpenApi {
         info: Info {
@@ -130,6 +143,7 @@ async fn main() {
         .serve(
             app.finish_api(&mut api)
                 .layer(Extension(api))
+                .layer(CompressionLayer::new().zstd(true))
                 .into_make_service(),
         )
         .await
