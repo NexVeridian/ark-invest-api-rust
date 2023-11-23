@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-polars = { version = "0.32", features = [
+polars = { version = "0.35", features = [
 	"lazy",
 	"strings",
 	"parquet",
@@ -16,7 +16,7 @@ axum = "0.6"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tokio = { version = "1.26", features = ["full"] }
-aide = { version = "0.11", features = ["redoc", "axum"] }
+aide = { version = "0.12", features = ["redoc", "axum"] }
 schemars = { version = "0.8", features = ["chrono"] }
 chrono = { version = "0.4", features = ["serde"] }
 glob = { version = "0.3" }

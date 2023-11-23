@@ -89,12 +89,15 @@ async fn main() {
         .api_route(
             "/ark_holdings",
             get_with(routes::ark_holdings, |mut o| {
-                // test description
-                o = o.id("ARK* ETF Holdings").description(r"
-                | date       ┆ ticker     ┆ cusip      ┆ company      ┆ market_value ┆ shares  ┆ share_price ┆ weight │
-                │ ---        ┆ ---        ┆ ---        ┆ ---          ┆ ---          ┆ ---     ┆ ---         ┆ ---    │
-                │ date       ┆ str        ┆ str        ┆ str          ┆ i64          ┆ f64     ┆ f64         ┆ f64    │
-                ");
+                o = o.id("ARK Holdings").description(
+                    r"
+| date | ticker | cusip | company | market_value | shares | share_price | weight |
+|------|--------|-------|---------|--------------|--------|-------------|--------|
+| date | str    | str   | str     | i64          | f64    | f64         | f64    |
+
+### Example
+`/ark_holdings?ticker=ARKK&start=2023-01-01&end=2023-03-01`",
+                );
                 description_date(o)
             }),
         )
