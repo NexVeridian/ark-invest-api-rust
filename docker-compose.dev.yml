@@ -1,4 +1,3 @@
-version: "3"
 services:
     ark-invest-api-rust:
         image: ark-invest-api-rust

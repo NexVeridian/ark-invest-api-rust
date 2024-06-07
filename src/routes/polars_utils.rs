@@ -64,11 +64,14 @@ pub enum TypeTicker {
     ARKQ,
     ARKW,
     ARKX,
-    // ARKA,
-    // ARKZ,
+    ARKA,
+    ARKZ,
     ARKC,
     ARKD,
     ARKY,
+    ARKB,
+    PRNT,
+    IZRL
 }
 
 #[derive(Serialize, Deserialize, JsonSchema)]
