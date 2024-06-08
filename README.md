@@ -1,6 +1,8 @@
 A REST API for ARK Invest holdings data, written in rust using [axum](https://github.com/tokio-rs/axum), Redoc/Swagger through [Aide](https://github.com/tamasfe/aide), and parquet using [polars](https://github.com/pola-rs/polars)
 
-[api.NexVeridian.com](https://api.NexVeridian.com)
+The REST API is hosted at [api.NexVeridian.com](https://api.NexVeridian.com)
+
+The code for the data generator is [github.com/NexVeridian/ark-invest-api-rust-data](https://github.com/NexVeridian/ark-invest-api-rust-data) 
 
 Not affiliated with Ark Invest
 
