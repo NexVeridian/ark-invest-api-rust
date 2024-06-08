@@ -111,7 +111,7 @@ async fn main() {
                     r"
 | date | ticker | cusip | company | market_value | shares | share_price | weight |
 |------|--------|-------|---------|--------------|--------|-------------|--------|
-| date | str    | str   | str     | i64          | f64    | f64         | f64    |
+| date | str    | str   | str     | i64          | i64    | f64         | f64    |
 
 ### Example
 `/ark_holdings?ticker=ARKK&start=2023-10-01&end=2023-11-01`",

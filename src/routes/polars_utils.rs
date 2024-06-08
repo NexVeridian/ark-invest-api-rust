@@ -55,6 +55,7 @@ pub async fn filter_date_range(
     Ok(filter_df)
 }
 
+#[allow(clippy::upper_case_acronyms)]
 #[derive(Serialize, Deserialize, JsonSchema, strum_macros::Display)]
 pub enum TypeTicker {
     ARKVX,
