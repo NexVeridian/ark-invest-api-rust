@@ -79,7 +79,7 @@ pub enum TypeTicker {
 
     EUROPE_ARKI,
     EUROPE_ARKG,
-    EUROPE_ARRK,
+    EUROPE_ARKK,
 
     CYBR,
     CYCL,
