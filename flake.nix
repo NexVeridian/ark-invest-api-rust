@@ -73,7 +73,8 @@
           tag = "latest";
           copyToRoot = [ my-crate ];
           config = {
-            Cmd = [ "${my-crate}/bin/ark-invest-api-rust" ];
+            Cmd = [ "./ark-invest-api-rust" ];
+            WorkingDir = "${my-crate}/ark-invest-api-rust";
             Env = [ "PORT=3000" ];
             Expose = [ 3000 ];
           };
