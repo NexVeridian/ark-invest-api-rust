@@ -29,7 +29,7 @@
 			"type": "volume"
 		},
 		{
-			"source": "nix-store",
+			"source": "nix-store-${containerWorkspaceFolderBasename}",
 			"target": "/nix/store",
 			"type": "volume"
 		}
