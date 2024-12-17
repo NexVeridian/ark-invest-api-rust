@@ -1,5 +1,4 @@
 precommit:
-	rustup update
 	cargo update
 	cargo check
 	cargo fmt
@@ -7,7 +6,6 @@ precommit:
 	cargo clippy --fix --allow-dirty
 
 check:
-	rustup update
 	cargo update
 	nix flake update
 	nix flake check
