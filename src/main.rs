@@ -13,7 +13,7 @@ use axum::{
     BoxError, Extension, Json,
 };
 use lazy_static::lazy_static;
-use std::{env, net::SocketAddr, time::Duration};
+use std::{env, net::SocketAddr, sync::Arc, time::Duration};
 use tower::{buffer::BufferLayer, limit::RateLimitLayer, ServiceBuilder};
 use tower_governor::{
     governor::GovernorConfigBuilder, key_extractor::SmartIpKeyExtractor, GovernorLayer,
@@ -67,7 +67,7 @@ async fn main() {
     };
 
     let rate_limit_ip = || {
-        let config = Box::new(
+        let config = Arc::new(
             GovernorConfigBuilder::default()
                 .per_millisecond(500)
                 .burst_size(25)
@@ -77,11 +77,7 @@ async fn main() {
                 .unwrap(),
         );
 
-        ServiceBuilder::new()
-            .layer(error_handler())
-            .layer(GovernorLayer {
-                config: Box::leak(config),
-            })
+        ServiceBuilder::new().layer(GovernorLayer { config })
     };
 
     let cors = || {
@@ -124,8 +120,8 @@ async fn main() {
     let mut api = OpenApi {
         info: Info {
             summary: Some(
-                "A REST API for ARK Invest holdings data, writen in rust using [axum](https://github.com/tokio-rs/axum), 
-                Redoc/Swagger through [Aide](https://github.com/tamasfe/aide), 
+                "A REST API for ARK Invest holdings data, writen in rust using [axum](https://github.com/tokio-rs/axum),
+                Redoc/Swagger through [Aide](https://github.com/tamasfe/aide),
                 and parquet using [polars](https://github.com/pola-rs/polars)\n\nNot affiliated with Ark Invest
                 ".to_owned(),
             ),
@@ -139,13 +135,14 @@ async fn main() {
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
     println!("listening on {}", addr);
-    axum::Server::bind(&addr)
-        .serve(
-            app.finish_api(&mut api)
-                .layer(Extension(api))
-                .layer(CompressionLayer::new().zstd(true))
-                .into_make_service(),
-        )
-        .await
-        .unwrap();
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    axum::serve(
+        listener,
+        app.finish_api(&mut api)
+            .layer(Extension(api))
+            .layer(CompressionLayer::new().zstd(true))
+            .into_make_service(),
+    )
+    .await
+    .unwrap();
 }
