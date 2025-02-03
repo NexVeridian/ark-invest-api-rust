@@ -1,22 +1,22 @@
 use aide::{
     axum::{
-        routing::{get, get_with},
         ApiRouter, IntoApiResponse,
+        routing::{get, get_with},
     },
     openapi::{Info, OpenApi},
     redoc::Redoc,
     transform::TransformOperation,
 };
 use axum::{
+    BoxError, Extension, Json,
     error_handling::HandleErrorLayer,
     http::{Method, StatusCode},
-    BoxError, Extension, Json,
 };
 use lazy_static::lazy_static;
 use std::{env, net::SocketAddr, sync::Arc, time::Duration};
-use tower::{buffer::BufferLayer, limit::RateLimitLayer, ServiceBuilder};
+use tower::{ServiceBuilder, buffer::BufferLayer, limit::RateLimitLayer};
 use tower_governor::{
-    governor::GovernorConfigBuilder, key_extractor::SmartIpKeyExtractor, GovernorLayer,
+    GovernorLayer, governor::GovernorConfigBuilder, key_extractor::SmartIpKeyExtractor,
 };
 use tower_http::{
     compression::CompressionLayer,
@@ -39,7 +39,7 @@ async fn serve_api(Extension(api): Extension<OpenApi>) -> impl IntoApiResponse {
     Json(api)
 }
 
-fn description_date(op: TransformOperation) -> TransformOperation {
+fn description_date(op: TransformOperation<'_>) -> TransformOperation<'_> {
     op.parameter_untyped("start", |p| {
         p.description("Start date range - Inclusive >= - ISO 8601")
     })

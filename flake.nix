@@ -44,7 +44,6 @@
               fpc.rustc
               fpc.clippy
               fpc.rust-src
-              fpc.rustc
               fpc.rustfmt
               fpc.rustc-codegen-cranelift-preview
             ])
@@ -64,19 +63,12 @@
             ++ lib.optionals pkgs.stdenv.isDarwin [
               # Additional darwin specific inputs can be set here
               pkgs.libiconv
+              pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
             ];
 
           # Additional environment variables can be set directly
           # MY_CUSTOM_VAR = "some value";
         };
-
-        craneLibLLvmTools = craneLib.overrideToolchain (
-          fenix.packages.${system}.complete.withComponents [
-            "cargo"
-            "llvm-tools"
-            "rustc"
-          ]
-        );
 
         # Build *just* the cargo dependencies, so we can reuse
         # all of that work (e.g. via cachix) when running in CI
@@ -119,7 +111,10 @@
             commonArgs
             // {
               inherit cargoArtifacts;
-              cargoClippyExtraArgs = "--all-targets -- --deny warnings";
+              cargoClippyExtraArgs = ''
+                --all --all-targets -- --deny warnings -W clippy::nursery -W rust-2018-idioms \
+                -A clippy::future_not_send -A clippy::option_if_let_else -A clippy::or_fun_call
+              '';
             }
           );
 
@@ -151,6 +146,7 @@
               inherit cargoArtifacts;
               partitions = 1;
               partitionType = "count";
+              cargoExtraArgs = "--no-tests pass";
             }
           );
         };
