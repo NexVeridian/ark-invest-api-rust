@@ -5,24 +5,23 @@ edition = "2024"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-polars = { version = "0.45", features = [
-    "lazy",
-    "strings",
-    "parquet",
-    "round_series",
-    "serde",
-    "json",
-] }
+aide = { version = "0.13", features = ["axum", "redoc"] }
 axum = "0.7"
+chrono = { version = "0.4", features = ["serde"] }
+lazy_static = "1.5"
+polars = { version = "0.45", features = [
+  "json",
+  "lazy",
+  "parquet",
+  "round_series",
+  "serde",
+  "strings",
+] }
+schemars = { version = "0.8", features = ["chrono"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-tokio = { version = "1.44", features = ["full"] }
-aide = { version = "0.13", features = ["redoc", "axum"] }
-schemars = { version = "0.8", features = ["chrono"] }
-chrono = { version = "0.4", features = ["serde"] }
-glob = { version = "0.3" }
 strum_macros = "0.26"
-tower = { version = "0.5", features = ["limit", "buffer", "util"] }
-tower-http = { version = "0.6", features = ["compression-zstd", "cors"] }
+tokio = { version = "1.44", features = ["full"] }
+tower = { version = "0.5", features = ["buffer", "limit", "util"] }
 tower_governor = "0.5"
-lazy_static = "1.5"
+tower-http = { version = "0.6", features = ["compression-zstd", "cors"] }

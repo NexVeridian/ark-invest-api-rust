@@ -112,7 +112,6 @@ dependencies = [
  "aide",
  "axum",
  "chrono",
- "glob",
  "lazy_static",
  "polars",
  "schemars",
