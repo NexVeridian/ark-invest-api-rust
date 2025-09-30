@@ -1,3 +1,10 @@
+use std::{
+    env,
+    net::SocketAddr,
+    sync::{Arc, LazyLock},
+    time::Duration,
+};
+
 use aide::{
     axum::{
         ApiRouter, IntoApiResponse,
@@ -12,8 +19,6 @@ use axum::{
     error_handling::HandleErrorLayer,
     http::{Method, StatusCode},
 };
-use lazy_static::lazy_static;
-use std::{env, net::SocketAddr, sync::Arc, time::Duration};
 use tower::{ServiceBuilder, buffer::BufferLayer, limit::RateLimitLayer};
 use tower_governor::{
     GovernorLayer, governor::GovernorConfigBuilder, key_extractor::SmartIpKeyExtractor,
@@ -25,15 +30,13 @@ use tower_http::{
 
 mod routes;
 
-lazy_static! {
-    static ref NGINX: bool = match env::var("NGINX") {
-        Ok(val) => val
-            .to_lowercase()
+static NGINX: LazyLock<bool> = LazyLock::new(|| {
+    env::var("NGINX").map_or(true, |val| {
+        val.to_lowercase()
             .parse::<bool>()
-            .expect("Env string NGINX must be bool"),
-        Err(_) => true,
-    };
-}
+            .expect("Env string NGINX must be bool")
+    })
+});
 
 async fn serve_api(Extension(api): Extension<OpenApi>) -> impl IntoApiResponse {
     Json(api)
@@ -54,7 +57,7 @@ async fn main() {
         ServiceBuilder::new().layer(HandleErrorLayer::new(|err: BoxError| async move {
             (
                 StatusCode::INTERNAL_SERVER_ERROR,
-                format!("Unhandled error: {}", err),
+                format!("Unhandled error: {err}"),
             )
         }))
     };
@@ -134,7 +137,7 @@ async fn main() {
     };
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
-    println!("listening on {}", addr);
+    println!("listening on {addr}");
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
     axum::serve(
         listener,

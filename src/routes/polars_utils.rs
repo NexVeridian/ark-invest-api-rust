@@ -1,19 +1,19 @@
+use std::{error::Error, fs::File};
+
 use axum::extract::Query;
 use chrono::NaiveDate;
 use polars::prelude::*;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::error::Error;
-use std::fs::File;
 
-pub async fn get_parquet(file: String) -> Result<DataFrame, Box<dyn Error>> {
-    let mut file = File::open(format!("data/parquet/{}.parquet", file))?;
+pub fn get_parquet(file: &str) -> Result<DataFrame, Box<dyn Error>> {
+    let mut file = File::open(format!("data/parquet/{file}.parquet"))?;
     let df = ParquetReader::new(&mut file).finish()?;
     Ok(df)
 }
 
-pub async fn to_json(mut df: DataFrame) -> Result<Value, Box<dyn Error>> {
+pub fn to_json(mut df: DataFrame) -> Result<Value, Box<dyn Error>> {
     let mut buffer = Vec::new();
     JsonWriter::new(&mut buffer)
         .with_json_format(JsonFormat::Json)
@@ -29,9 +29,9 @@ pub struct DateRange {
     end: Option<NaiveDate>,
 }
 
-pub async fn filter_date_range(
+pub fn filter_date_range(
     df: DataFrame,
-    date_range: Query<DateRange>,
+    date_range: &Query<DateRange>,
 ) -> Result<DataFrame, Box<dyn Error>> {
     if date_range.start.or(date_range.end).is_none() {
         return Ok(df);
