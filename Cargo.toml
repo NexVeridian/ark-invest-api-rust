@@ -46,7 +46,7 @@ schemars = { version = "0.8", features = ["chrono"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 strum_macros = "0.26"
-tokio = { version = "1.44", features = ["full"] }
+tokio = { version = "1.48", features = ["full"] }
 tower = { version = "0.5", features = ["buffer", "limit", "util"] }
 tower_governor = "0.5"
 tower-http = { version = "0.6", features = ["compression-zstd", "cors"] }
