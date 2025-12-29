@@ -100,10 +100,11 @@
             pkgs.runCommand "tombi-lint"
               {
                 buildInputs = [ pkgs.tombi ];
+                XDG_CACHE_HOME = "/tmp/tombi-cache";
               }
               ''
                 cd ${src}
-                tombi lint
+                tombi lint --offline --no-cache
                 touch $out
               '';
 
